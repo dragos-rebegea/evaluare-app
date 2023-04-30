@@ -8,6 +8,8 @@ function StudentPage() {
     const [students, setStudents] = useState([]);
     const [studentIds, setStudentIds] = useState([]);
     const [grades, setGrades] = useState([]);
+    const [exercises, setExercises] = useState([]);
+    const [selectedVariant, setSelectedVariant] = useState("");
 
     useEffect(() => {
         const isAuthenticated = !!localStorage.getItem("token");
@@ -30,7 +32,10 @@ function StudentPage() {
                         Authorization: `Bearer ${token}`,
                     },
                 };
-                const response = await api.get(`evaluation/getStudentsByClass/${classId}`, config);
+                const response = await api.get(
+                    `evaluation/getStudentsByClass/${classId}`,
+                    config
+                );
                 const data = response.data.data;
                 setStudentIds(data.map((student) => student.ID));
                 setStudents(data);
@@ -56,7 +61,10 @@ function StudentPage() {
                         Authorization: `Bearer ${token}`,
                     },
                 };
-                const response = await api.get(`evaluation/getCalificative/${studentId}`, config);
+                const response = await api.get(
+                    `evaluation/getCalificative/${studentId}`,
+                    config
+                );
                 const data = response.data.data ?? [];
                 setGrades(data);
             } catch (error) {
@@ -67,15 +75,47 @@ function StudentPage() {
         fetchGrades();
     }, [studentId]);
 
+    useEffect(() => {
+        const fetchExercises = async () => {
+            const token = localStorage.getItem("token");
+            if (token === null) {
+                navigate("/");
+                return;
+            }
+
+            try {
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                const response = await api.get(
+                    `evaluation/getExercitii/${studentId}`,
+                    config
+                );
+                const data = response.data.data ?? [];
+                setExercises(data);
+            } catch (error) {
+                console.error("Failed to fetch exercises:", error);
+            }
+        };
+
+        fetchExercises();
+    }, [studentId]);
+
     const handlePrevious = () => {
-        const currentIndex = studentIds.findIndex((id) => id === parseInt(studentId));
+        const currentIndex = studentIds.findIndex(
+            (id) => id === parseInt(studentId)
+        );
         if (currentIndex > 0) {
             navigate(`/class/${classId}/student/${studentIds[currentIndex - 1]}`);
         }
     };
 
     const handleNext = () => {
-        const currentIndex = studentIds.findIndex((id) => id === parseInt(studentId));
+        const currentIndex = studentIds.findIndex(
+            (id) => id === parseInt(studentId)
+        );
         if (currentIndex < studentIds.length - 1) {
             navigate(`/class/${classId}/student/${studentIds[currentIndex + 1]}`);
         }
@@ -85,6 +125,40 @@ function StudentPage() {
 
     const handleBack = () => {
         navigate(`/class/${classId}`);
+    };
+
+    const handleAddGrade = async (exercise) => {
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            navigate("/");
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            const body = {
+                student_id: parseInt(studentId),
+                exam: grades[0].exam,
+                Exercitiu: exercise.numar,
+                Varianta: selectedVariant,
+            };
+
+            const response = await api.post(
+                "evaluation/addCalificativ",
+                body,
+                config
+            );
+
+            const newGrades = [...grades, response.data.data];
+            setGrades(newGrades);
+        } catch (error) {
+            console.error("Failed to add grade:", error);
+        }
     };
 
     return (
@@ -98,18 +172,49 @@ function StudentPage() {
                 <tr>
                     <th>Exercitiu</th>
                     <th>Varianta</th>
-                    <th>Nota</th>
+                    <th></th>
                 </tr>
                 </thead>
                 {/* Table body */}
                 <tbody>
-                {grades.map((grade) => (
-                    <tr key={grade.ID}>
-                        <td>{grade.exercitiu}</td>
-                        <td>{grade.varianta}</td>
-                        <td>{grade.nota}</td>
-                    </tr>
-                ))}
+                {exercises.map((exercise) => {
+                    const grade = grades.find(
+                        (grade) =>
+                            grade.exercitiu === exercise.numar && grade.varianta
+                    );
+
+                    if (grade) {
+                        return (
+                            <tr key={grade.ID}>
+                                <td>{grade.exercitiu}</td>
+                                <td>{grade.varianta}</td>
+                                <td></td>
+                            </tr>
+                        );
+                    } else {
+                        return (
+                            <tr key={exercise.numar}>
+                                <td>{exercise.numar}</td>
+                                <td>
+                                    <select
+                                        value={selectedVariant}
+                                        onChange={(e) => setSelectedVariant(e.target.value)}
+                                    >
+                                        {exercise.variante.map((varianta) => (
+                                            <option key={varianta} value={varianta}>
+                                                {varianta}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
+                                <td contentEditable="true"></td>
+                                <td>
+                                    <button onClick={() => handleAddGrade(exercise)}>Add</button>
+                                </td>
+                            </tr>
+                        );
+                    }
+                })}
                 </tbody>
             </table>
             <button onClick={handlePrevious}>Previous</button>
@@ -117,6 +222,7 @@ function StudentPage() {
             <button onClick={handleBack}>Back to Class</button>
         </div>
     );
+
 
 }
 
