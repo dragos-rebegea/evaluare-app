@@ -164,14 +164,14 @@ function StudentPage() {
     return (
         <div>
             <h1>
-                {`${student?.nume} ${student?.prenume}`} - {`${grades[0]?.exam}`}
+                {`${student?.nume} ${student?.prenume}`} - Test {`${exercises[0]?.exam}`}
             </h1>
             <table>
                 {/* Table header */}
                 <thead>
                 <tr>
                     <th>Exercitiu</th>
-                    <th>Varianta</th>
+                    <th>Cod</th>
                     <th></th>
                 </tr>
                 </thead>
