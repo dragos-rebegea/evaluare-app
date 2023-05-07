@@ -47,6 +47,8 @@ function StudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
             <td>{exercise.numar}</td>
             <td>
                 <select
+                    className="custom-select"
+                    style={{ width: "100px" }}
                     value={selectedVariant}
                     onChange={(e) => setSelectedVariant(e.target.value)}
                 >
@@ -59,10 +61,7 @@ function StudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
                         </option>
                     ))}
                 </select>
-            </td>
-            <td contentEditable="true"></td>
-            <td>
-                <button onClick={() => handleAddGrade(exercise)}>Add</button>
+                <button className="btn btn-primary btn-sm ml-2" onClick={() => handleAddGrade(exercise)}>Salveaza</button>
             </td>
         </tr>
     );
@@ -193,44 +192,46 @@ function StudentPage() {
     };
 
     return (
-        <div>
-            <h1>
-                {`${student?.nume} ${student?.prenume}`} - Test {`${exercises[0]?.exam}`}
-            </h1>
-            <table>
-                {/* Table header */}
-                <thead>
-                    <tr>
-                        <th>Exercitiu</th>
-                        <th>Cod</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                {/* Table body */}
-                <tbody>
-                    {exercises.map((exercise) => {
-                        const grade = grades.find(
-                            (grade) =>
-                                grade?.exercitiu === exercise.numar && grade.varianta
-                        );
+        <div className="container">
+            <div className="row">
+                <div className="col-12">
+                    <h1>
+                        {`${student?.nume} ${student?.prenume}`} - Test {`${exercises[0]?.exam}`}
+                    </h1>
+                    <button className="btn btn-secondary mr-2" onClick={handleBack}>Back to Class</button>
+                    <table className="table table-striped my-4">
+                        {/* Table header */}
+                        <thead>
+                            <tr>
+                                <th>Exercitiu</th>
+                                <th>Cod</th>
+                            </tr>
+                        </thead>
+                        {/* Table body */}
+                        <tbody>
+                            {exercises.map((exercise) => {
+                                const grade = grades.find(
+                                    (grade) =>
+                                        grade?.exercitiu === exercise.numar && grade.varianta
+                                );
 
-                        if (grade) {
-                            return (
-                                <tr key={grade.ID}>
-                                    <td>{grade.exercitiu}</td>
-                                    <td>{grade.varianta}</td>
-                                    <td></td>
-                                </tr>
-                            );
-                        } else {
-                            return <StudentGrade key={exercise.numar} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
-                        }
-                    })}
-                </tbody>
-            </table>
-            <button onClick={handlePrevious}>Previous</button>
-            <button onClick={handleNext}>Next</button>
-            <button onClick={handleBack}>Back to Class</button>
+                                if (grade) {
+                                    return (
+                                        <tr key={grade.ID}>
+                                            <td>{grade.exercitiu}</td>
+                                            <td>{grade.varianta}</td>
+                                        </tr>
+                                    );
+                                } else {
+                                    return <StudentGrade key={exercise.numar} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
+                                }
+                            })}
+                        </tbody>
+                    </table>
+                    <button className="btn btn-primary mr-2" onClick={handlePrevious}>{"<"} Previous</button>
+                    <button className="btn btn-primary mr-2" onClick={handleNext}>Next {">"}</button>
+                </div>
+            </div>
         </div>
     );
 

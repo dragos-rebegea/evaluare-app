@@ -61,18 +61,23 @@ function Dashboard() {
     };
 
     return (
-        <div>
-            <h1>Dashboard</h1>
-            <h2>Classes</h2>
-            <ul>
-                {classes.map((classItem, index) => (
-                    <li key={index}>
-                        <Link to={`/class/${classItem}`}>{classItem}</Link>
-                    </li>
-                ))}
-            </ul>
-            <button onClick={handleLogout}>Logout</button>
-        </div>
+        <div className="container">
+            <div className="row">
+                <div className="col-12">
+                    <h1>Dashboard</h1>
+                    <h2 className="mt-4">Classes</h2>
+                    <ul className="list-group">
+                        {classes.map((classItem, index) => (
+                            <Link key={index} to={`/class/${classItem}`}>
+                                <li className="list-group-item">{classItem}</li>
+                            </Link>
+                        ))}
+                    </ul>
+                    <button className="btn btn-danger mt-4" onClick={handleLogout}>Logout</button>
+                </div>
+            </div>
+
+        </div >
     );
 }
 
