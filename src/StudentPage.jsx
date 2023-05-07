@@ -2,6 +2,72 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "./api";
 
+
+function StudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
+    const navigate = useNavigate();
+
+    const [selectedVariant, setSelectedVariant] = useState("");
+
+    const handleAddGrade = async (exercise) => {
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            navigate("/");
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            const body = {
+                student_id: parseInt(studentId),
+                exam: exercises[0].exam,
+                Exercitiu: exercise.numar,
+                Varianta: selectedVariant,
+            };
+
+            const response = await api.post(
+                "evaluation/addCalificativ",
+                body,
+                config
+            );
+
+            const newGrades = [...grades, response.data.data];
+            setGrades(newGrades);
+        } catch (error) {
+            console.error("Failed to add grade:", error);
+        }
+    };
+
+    return (
+        <tr>
+            <td>{exercise.numar}</td>
+            <td>
+                <select
+                    value={selectedVariant}
+                    onChange={(e) => setSelectedVariant(e.target.value)}
+                >
+                    <option key={'default'} value={'-'}>
+                        -
+                    </option>
+                    {exercise.variante.map((varianta) => (
+                        <option key={varianta} value={varianta}>
+                            {varianta}
+                        </option>
+                    ))}
+                </select>
+            </td>
+            <td contentEditable="true"></td>
+            <td>
+                <button onClick={() => handleAddGrade(exercise)}>Add</button>
+            </td>
+        </tr>
+    );
+}
+
 function StudentPage() {
     const { classId, studentId } = useParams();
     const navigate = useNavigate();
@@ -9,7 +75,6 @@ function StudentPage() {
     const [studentIds, setStudentIds] = useState([]);
     const [grades, setGrades] = useState([]);
     const [exercises, setExercises] = useState([]);
-    const [selectedVariant, setSelectedVariant] = useState("");
 
     useEffect(() => {
         const isAuthenticated = !!localStorage.getItem("token");
@@ -127,40 +192,6 @@ function StudentPage() {
         navigate(`/class/${classId}`);
     };
 
-    const handleAddGrade = async (exercise) => {
-        const token = localStorage.getItem("token");
-        if (token === null) {
-            navigate("/");
-            return;
-        }
-
-        try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
-            const body = {
-                student_id: parseInt(studentId),
-                exam: grades[0].exam,
-                Exercitiu: exercise.numar,
-                Varianta: selectedVariant,
-            };
-
-            const response = await api.post(
-                "evaluation/addCalificativ",
-                body,
-                config
-            );
-
-            const newGrades = [...grades, response.data.data];
-            setGrades(newGrades);
-        } catch (error) {
-            console.error("Failed to add grade:", error);
-        }
-    };
-
     return (
         <div>
             <h1>
@@ -169,52 +200,32 @@ function StudentPage() {
             <table>
                 {/* Table header */}
                 <thead>
-                <tr>
-                    <th>Exercitiu</th>
-                    <th>Cod</th>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th>Exercitiu</th>
+                        <th>Cod</th>
+                        <th></th>
+                    </tr>
                 </thead>
                 {/* Table body */}
                 <tbody>
-                {exercises.map((exercise) => {
-                    const grade = grades.find(
-                        (grade) =>
-                            grade.exercitiu === exercise.numar && grade.varianta
-                    );
+                    {exercises.map((exercise) => {
+                        const grade = grades.find(
+                            (grade) =>
+                                grade?.exercitiu === exercise.numar && grade.varianta
+                        );
 
-                    if (grade) {
-                        return (
-                            <tr key={grade.ID}>
-                                <td>{grade.exercitiu}</td>
-                                <td>{grade.varianta}</td>
-                                <td></td>
-                            </tr>
-                        );
-                    } else {
-                        return (
-                            <tr key={exercise.numar}>
-                                <td>{exercise.numar}</td>
-                                <td>
-                                    <select
-                                        value={selectedVariant}
-                                        onChange={(e) => setSelectedVariant(e.target.value)}
-                                    >
-                                        {exercise.variante.map((varianta) => (
-                                            <option key={varianta} value={varianta}>
-                                                {varianta}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </td>
-                                <td contentEditable="true"></td>
-                                <td>
-                                    <button onClick={() => handleAddGrade(exercise)}>Add</button>
-                                </td>
-                            </tr>
-                        );
-                    }
-                })}
+                        if (grade) {
+                            return (
+                                <tr key={grade.ID}>
+                                    <td>{grade.exercitiu}</td>
+                                    <td>{grade.varianta}</td>
+                                    <td></td>
+                                </tr>
+                            );
+                        } else {
+                            return <StudentGrade key={exercise.numar} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
+                        }
+                    })}
                 </tbody>
             </table>
             <button onClick={handlePrevious}>Previous</button>
