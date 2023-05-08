@@ -100,7 +100,7 @@ function EditStudentGrade({ studentId, grade, exercise, exercises, grades, setGr
                 config
             );
 
-            const newGrades = [...grades, response.data.data];
+            const newGrades = [...grades.filter((g) => g.exercitiu !== grade.exercitiu), response.data.data];
             setGrades(newGrades);
             setEditMode(false)
         } catch (error) {
