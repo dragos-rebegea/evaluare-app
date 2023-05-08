@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "./api";
 
 function ClassPage() {
@@ -35,17 +35,23 @@ function ClassPage() {
     };
 
     return (
-        <div>
-            <h1>Class {classId}</h1>
-            <h2>Students</h2>
-            <ul>
-                {students.map((student, index) => (
-                    <li key={index} onClick={() => navigate(`/class/${classId}/student/${student.ID}`)}>
-                        {student.nume} {student.prenume}
-                    </li>
-                ))}
-            </ul>
-            <button onClick={handleBack}>Back to Dashboard</button>
+        <div className="container">
+            <div className="row mb-4">
+                <div className="col-12">
+                    <h1>Class {classId}</h1>
+                    <button className="btn btn-secondary my-2" onClick={handleBack}>Back to Dashboard</button>
+                    <h2>Students</h2>
+                    <ul className="list-group">
+                        {students.map((student, index) => (
+                            <li key={index} className="list-group-item">
+                                <Link to={`/class/${classId}/student/${student.ID}`}>
+                                    {student.nume} {student.prenume}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
         </div>
     );
 }
