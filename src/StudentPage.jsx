@@ -112,7 +112,9 @@ function EditStudentGrade({ studentId, grade, exercise, exercises, grades, setGr
         return (
             <tr key={grade.ID}>
                 <td>{grade.exercitiu}</td>
-                <td>{grade.varianta}  <button className="btn btn-sm btn-secondary ml-2" onClick={() => setEditMode(true)}>Edit</button></td>
+                <td>
+                    <b style={{ display: "inline-block", width: "50px" }}>{grade.varianta}</b>
+                    <button className="btn btn-sm btn-secondary ml-2" onClick={() => setEditMode(true)}>Edit</button></td>
             </tr>
         );
     }
