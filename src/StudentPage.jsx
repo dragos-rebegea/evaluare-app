@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "./api";
 
 
-function StudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
+function AddStudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
     const navigate = useNavigate();
 
     const [selectedVariant, setSelectedVariant] = useState("");
@@ -62,6 +62,79 @@ function StudentGrade({ studentId, exercise, exercises, grades, setGrades }) {
                     ))}
                 </select>
                 <button className="btn btn-primary btn-sm ml-2" onClick={() => handleAddGrade(exercise)}>Salveaza</button>
+            </td>
+        </tr>
+    );
+}
+
+function EditStudentGrade({ studentId, grade, exercise, exercises, grades, setGrades }) {
+    const navigate = useNavigate();
+
+    const [editMode, setEditMode] = useState(false);
+    const [selectedVariant, setSelectedVariant] = useState(grade.varianta);
+
+    const handleEditGrade = async () => {
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            navigate("/");
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            const body = {
+                student_id: parseInt(studentId),
+                exam: exercises[0].exam,
+                Exercitiu: exercise.numar,
+                Varianta: selectedVariant,
+            };
+
+            const response = await api.post(
+                "evaluation/updateCalificativ",
+                body,
+                config
+            );
+
+            const newGrades = [...grades, response.data.data];
+            setGrades(newGrades);
+            setEditMode(false)
+        } catch (error) {
+            console.error("Failed to update grade:", error);
+        }
+    }
+
+    if (!editMode) {
+        return (
+            <tr key={grade.ID}>
+                <td>{grade.exercitiu}</td>
+                <td>{grade.varianta}  <button className="btn btn-sm btn-secondary ml-2" onClick={() => setEditMode(true)}>Edit</button></td>
+            </tr>
+        );
+    }
+
+    return (
+        <tr key={grade.ID}>
+            <td>{grade.exercitiu}</td>
+            <td>
+                <select
+                    className="custom-select"
+                    style={{ width: "100px" }}
+                    value={selectedVariant}
+                    onChange={(e) => setSelectedVariant(e.target.value)}
+                >
+                    {exercise.variante.map((varianta) => (
+                        <option key={varianta} value={varianta}>
+                            {varianta}
+                        </option>
+                    ))}
+                </select>
+                <button className="btn btn-primary btn-sm ml-2" onClick={() => handleEditGrade()}>Save</button>
+                <button className="btn btn-danger btn-sm ml-2" onClick={() => setEditMode(false)}>Close</button>
             </td>
         </tr>
     );
@@ -203,7 +276,7 @@ function StudentPage() {
                         {/* Table header */}
                         <thead>
                             <tr>
-                                <th>Exercitiu</th>
+                                <th style={{ width: "300px" }}>Exercitiu</th>
                                 <th>Cod</th>
                             </tr>
                         </thead>
@@ -216,14 +289,9 @@ function StudentPage() {
                                 );
 
                                 if (grade) {
-                                    return (
-                                        <tr key={grade.ID}>
-                                            <td>{grade.exercitiu}</td>
-                                            <td>{grade.varianta}</td>
-                                        </tr>
-                                    );
+                                    return <EditStudentGrade key={exercise.numar} grade={grade} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
                                 } else {
-                                    return <StudentGrade key={exercise.numar} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
+                                    return <AddStudentGrade key={exercise.numar} studentId={studentId} exercise={exercise} exercises={exercises} grades={grades} setGrades={setGrades} />
                                 }
                             })}
                         </tbody>
