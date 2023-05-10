@@ -20,7 +20,7 @@ function Dashboard() {
                     Authorization: `Bearer ${token}`,
                 },
             };
-            await api.get("admin/ping", config);
+            await api.get("evaluation/ping", config);
         } catch (error) {
             if (error.response && error.response.status !== 200) {
                 localStorage.removeItem("token");
