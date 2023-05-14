@@ -18,7 +18,8 @@ function ClassPage() {
                     },
                 };
                 const response = await api.get(`/evaluation/getStudentsByClass/${classId}`, config);
-                setStudents(response.data.data); // Use response.data.data instead of response.data
+                const sortedData = response.data.data.sort((a, b) => a.nume.localeCompare(b.nume));
+                setStudents(sortedData); // Use response.data.data instead of response.data
             } catch (error) {
                 console.error("Error fetching students:", error);
             }

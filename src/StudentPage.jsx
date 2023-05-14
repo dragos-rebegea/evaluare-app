@@ -175,9 +175,9 @@ function StudentPage() {
                     `evaluation/getStudentsByClass/${classId}`,
                     config
                 );
-                const data = response.data.data;
-                setStudentIds(data.map((student) => student.ID));
-                setStudents(data);
+                const sortedData = response.data.data.sort((a, b) => a.nume.localeCompare(b.nume));
+                setStudentIds(sortedData.map((student) => student.ID));
+                setStudents(sortedData);
             } catch (error) {
                 console.error("Failed to fetch students:", error);
             }
