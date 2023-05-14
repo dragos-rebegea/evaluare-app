@@ -19,7 +19,7 @@ function App() {
       localStorage.setItem("token", response.data.token);
       window.location.href = "/dashboard";
     } catch (error) {
-      setError(error.response.data.message || "An error occurred.");
+      setError(error.response.data.message || "Date incorecte.");
     }
   };
 
@@ -44,7 +44,7 @@ function App() {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Password:</label>
+                    <label>Parola:</label>
                     <input
                       type="password"
                       className="form-control"

@@ -64,8 +64,7 @@ function Dashboard() {
         <div className="container">
             <div className="row">
                 <div className="col-12">
-                    <h1>Dashboard</h1>
-                    <h2 className="mt-4">Classes</h2>
+                    <h1>Clase</h1>
                     <ul className="list-group">
                         {classes.map((classItem, index) => (
                             <Link key={index} to={`/class/${classItem}`}>

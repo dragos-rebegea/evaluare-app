@@ -114,7 +114,7 @@ function EditStudentGrade({ studentId, grade, exercise, exercises, grades, setGr
                 <td>{grade.exercitiu}</td>
                 <td>
                     <b style={{ display: "inline-block", width: "50px" }}>{grade.varianta}</b>
-                    <button className="btn btn-sm btn-secondary ml-2" onClick={() => setEditMode(true)}>Edit</button></td>
+                    <button className="btn btn-sm btn-secondary ml-2" onClick={() => setEditMode(true)}>Editeaza</button></td>
             </tr>
         );
     }
@@ -135,8 +135,8 @@ function EditStudentGrade({ studentId, grade, exercise, exercises, grades, setGr
                         </option>
                     ))}
                 </select>
-                <button className="btn btn-primary btn-sm ml-2" onClick={() => handleEditGrade()}>Save</button>
-                <button className="btn btn-danger btn-sm ml-2" onClick={() => setEditMode(false)}>Close</button>
+                <button className="btn btn-primary btn-sm ml-2" onClick={() => handleEditGrade()}>Salveaza</button>
+                <button className="btn btn-danger btn-sm ml-2" onClick={() => setEditMode(false)}>Inchide</button>
             </td>
         </tr>
     );
@@ -232,8 +232,48 @@ function StudentPage() {
                     `evaluation/getExercitii/${studentId}`,
                     config
                 );
-                const data = response.data.data ?? [];
-                setExercises(data);
+
+                const romanToArabic = (roman) => {
+                    let romanToNumber = {
+                        "1": 1,
+                        "2": 2,
+                        "3": 3,
+                        "4": 4,
+                        "5": 5,
+                        "6": 6,
+                        "7": 7,
+                        "8": 8,
+                        "9": 9,
+                        "10": 10,
+                        "11": 11,
+                        "12": 12,
+                        "13": 13,
+                        "14": 14,
+                        "15": 15,
+                        "I": 1,
+                        "IIA": 2,
+                        "IIB": 2,
+                        "III": 3,
+                        "IV1": 4,
+                        "IV2": 4,
+                        "IV3": 4,
+                        "IV4": 4,
+                        "V": 5,
+                        "VI": 6,
+                        "VII": 7,
+                        "VIII": 8,
+                        "IX": 9,
+                        "X": 10
+                    };
+                    return romanToNumber[roman] || null;
+                };
+
+                const sortedData = response.data.data.sort((a, b) => {
+                    let aNum = isNaN(a.numar) ? romanToArabic(a.numar) : +a.numar;
+                    let bNum = isNaN(b.numar) ? romanToArabic(b.numar) : +b.numar;
+                    return aNum - bNum;
+                });
+                setExercises(sortedData);
             } catch (error) {
                 console.error("Failed to fetch exercises:", error);
             }
@@ -270,10 +310,15 @@ function StudentPage() {
         <div className="container">
             <div className="row">
                 <div className="col-12">
-                    <h1>
-                        {`${student?.nume} ${student?.prenume}`} - Test {`${exercises[0]?.exam}`}
-                    </h1>
-                    <button className="btn btn-secondary mr-2" onClick={handleBack}>Back to Class</button>
+                    <h2>
+                        {`${student?.nume} ${student?.prenume}`} -
+                        {
+                            exercises[0]?.exam
+                                .replace('S', ' Testul ')
+                                .replace('L', ' Testul ')
+                        }
+                    </h2>
+                    <button className="btn btn-secondary mr-2" onClick={handleBack}>Inapoi la lista</button>
                     <table className="table table-striped my-4">
                         {/* Table header */}
                         <thead>
@@ -298,8 +343,8 @@ function StudentPage() {
                             })}
                         </tbody>
                     </table>
-                    <button className="btn btn-primary mr-2" onClick={handlePrevious}>{"<"} Previous</button>
-                    <button className="btn btn-primary mr-2" onClick={handleNext}>Next {">"}</button>
+                    <button className="btn btn-primary mr-2" onClick={handlePrevious}>{"<"}Inapoi</button>
+                    <button className="btn btn-primary mr-2" onClick={handleNext}>Inainte{">"}</button>
                 </div>
             </div>
         </div>

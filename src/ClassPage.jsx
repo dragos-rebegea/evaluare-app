@@ -38,9 +38,9 @@ function ClassPage() {
         <div className="container">
             <div className="row mb-4">
                 <div className="col-12">
-                    <h1>Class {classId}</h1>
-                    <button className="btn btn-secondary my-2" onClick={handleBack}>Back to Dashboard</button>
-                    <h2>Students</h2>
+                    <h1>Clasa {classId}</h1>
+                    <button className="btn btn-secondary my-2" onClick={handleBack}>Inapoi la clase</button>
+                    <h2>Elevi</h2>
                     <ul className="list-group">
                         {students.map((student, index) => (
                             <li key={index} className="list-group-item">
